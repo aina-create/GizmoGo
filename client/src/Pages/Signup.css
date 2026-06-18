@@ -1,0 +1,32 @@
+.auth-page--signup {
+	background:
+		radial-gradient(circle at top right, rgba(255, 184, 120, 0.24), transparent 34%),
+		radial-gradient(circle at bottom left, rgba(112, 205, 177, 0.18), transparent 34%),
+		linear-gradient(135deg, #0c1320 0%, #162037 48%, #1d2d44 100%);
+}
+
+.signup-link {
+	margin: 18px 0 0;
+	color: #5d6b82;
+}
+
+.success-banner {
+	margin: 0 0 16px;
+	padding: 14px 16px;
+	border-radius: 14px;
+	background: rgba(46, 160, 67, 0.12);
+	border: 1px solid rgba(46, 160, 67, 0.25);
+	color: #21733a;
+	font-weight: 700;
+	text-align: center;
+}
+
+.signup-link a {
+	color: #4f6fff;
+	font-weight: 600;
+	text-decoration: none;
+}
+
+.signup-link a:hover {
+	text-decoration: underline;
+}
