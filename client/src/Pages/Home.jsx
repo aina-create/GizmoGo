@@ -3,8 +3,17 @@ import Navbar from '../Components/Navbar.jsx'
 import Card, { ProductCatalog } from '../Components/Card.jsx'
 import './Home.css'
 
+const SESSION_STORAGE_KEY = 'northstar-session'
+const AUTH_TOKEN_KEY = 'northstar-token'
+
 function Home() {
 	const [searchTerm, setSearchTerm] = useState('')
+
+	const handleSignOut = () => {
+		window.localStorage.removeItem(SESSION_STORAGE_KEY)
+		window.localStorage.removeItem(AUTH_TOKEN_KEY)
+		window.location.href = '/login'
+	}
 
 	return (
 		<main className="home-page" id="top">
@@ -24,6 +33,12 @@ function Home() {
 						<a className="home-secondary" href="#collections">
 							Browse collections
 						</a>
+						<a className="home-add-product" href="/addproduct">
+							Add product
+						</a>
+						<button type="button" className="home-signout" onClick={handleSignOut}>
+							Sign out
+						</button>
 					</div>
 				</div>
 
