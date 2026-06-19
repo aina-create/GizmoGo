@@ -1,7 +1,8 @@
 import './App.css'
 import Home from './Pages/Home.jsx'
-import Login from './Pages/login.jsx'
-import Signup from './Pages/signup.jsx'
+import Login from './Pages/Login.jsx'
+import Signup from './Pages/Signup.jsx'
+import Addproduct from './Pages/Addproduct.jsx'
 
 function App() {
 	const pathname = window.location.pathname.toLowerCase()
@@ -12,6 +13,10 @@ function App() {
 
 	if (pathname === '/signup') {
 		return <Signup />
+	}
+
+	if (pathname === '/addproduct') {
+		return <Addproduct />
 	}
 
 	return <Login />

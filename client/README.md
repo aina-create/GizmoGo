@@ -1,16 +1,88 @@
-# React + Vite
+Northstar Audio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Northstar Audio is a React + Vite earbuds storefront. It features a landing page for browsing different types of earbuds, a navbar search bar, reusable product cards, and API-backed product data.
 
-Currently, two official plugins are available:
+Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Responsive earbuds storefront UI
+- Navbar with search filtering
+- Reusable product card component
+- Product images, prices, ratings, and feature lists
+- API-powered product catalog
+- Login and signup pages
 
-## React Compiler
+Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19
+- Vite
+- Axios
+- CSS modules via plain CSS files
 
-## Expanding the ESLint configuration
+API
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+The product cards load data from:
+
+- `https://sample-e-1.onrender.com/product/getproducts`
+
+Product images returned as relative upload paths are automatically prefixed with the backend URL.
+
+Getting Started
+
+Prerequisites
+
+- Node.js
+- npm
+
+Install Dependencies
+
+```bash
+npm install
+```
+
+Run the App
+
+```bash
+npm run dev
+```
+Build for Production
+
+```bash
+npm run build
+```
+
+Preview the Production Build
+
+```bash
+npm run preview
+```
+
+Lint the Project
+
+```bash
+npm run lint
+```
+
+Project Structure
+
+```text
+src/
+	Components/
+		Card.jsx
+		Navbar.jsx
+	Pages/
+		Home.jsx
+		Login.jsx
+		Signup.jsx
+	App.jsx
+	main.jsx
+```
+
+Notes
+
+- The home page shows earbuds in reusable cards.
+- The navbar search filters the visible products on the home page.
+- This project uses local page routing based on the browser path.
+
+License
+
+No license has been added yet.

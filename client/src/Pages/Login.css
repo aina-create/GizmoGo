@@ -181,6 +181,18 @@
 	box-shadow: 0 0 0 4px rgba(111, 147, 255, 0.16);
 }
 
+.auth-form input[aria-invalid='true'] {
+	border-color: #d64545;
+	box-shadow: 0 0 0 4px rgba(214, 69, 69, 0.12);
+}
+
+.field-error {
+	margin: -6px 0 0;
+	font-size: 0.88rem;
+	line-height: 1.4;
+	color: #d64545;
+}
+
 .login-options {
 	display: flex;
 	align-items: center;

@@ -1,6 +1,16 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { z } from 'zod'
 import './Login.css'
 import axios from "axios";
+
+const loginSchema = z.object({
+	email: z.string().trim().min(1, 'Email is required').email('Enter a valid email address'),
+	password: z.string().min(1, 'Password is required'),
+})
+
+const SESSION_STORAGE_KEY = 'northstar-session'
+const AUTH_TOKEN_KEY = 'northstar-token'
+const REMEMBERED_EMAIL_KEY = 'northstar-remembered-email'
 
 
 function Login() {
@@ -9,7 +19,22 @@ function Login() {
 		password: '',
 		rememberMe: true,
 	})
+	const [errors, setErrors] = useState({})
 	const [showPassword, setShowPassword] = useState(false)
+
+	useEffect(() => {
+		const rememberedEmail = window.localStorage.getItem(REMEMBERED_EMAIL_KEY)
+
+		if (!rememberedEmail) {
+			return
+		}
+
+		setFormData((current) => ({
+			...current,
+			email: rememberedEmail,
+			rememberMe: true,
+		}))
+	}, [])
 
 	const handleChange = (event) => {
 		const { name, type, checked, value } = event.target
@@ -18,31 +43,78 @@ function Login() {
 			...current,
 			[name]: type === 'checkbox' ? checked : value,
 		}))
+
+		if (name === 'email' || name === 'password') {
+			setErrors((current) => ({
+				...current,
+				[name]: undefined,
+			}))
+		}
 	}
 
-	// const handleSubmit = (event) => {
-	// 	event.preventDefault()
-	// 	window.location.href = '/home'
-	// }
-    const handleSubmit = async (event) => {
-  event.preventDefault();
+	const handleSubmit = async (event) => {
+		event.preventDefault()
 
-  try {
-    const response = await axios.post(
-      "https://sample-e-1.onrender.com/login",
-      {
-        email: formData.email,
-        password: formData.password,
-      }
-    );
+		const validation = loginSchema.safeParse({
+			email: formData.email,
+			password: formData.password,
+		})
 
-    console.log(response.data);
-    window.location.href = "/home";
-  } catch (error) {
-    console.error(error);
-    alert("Login failed");
-  }
-};
+		if (!validation.success) {
+			const fieldErrors = validation.error.flatten().fieldErrors
+
+			setErrors({
+				email: fieldErrors.email?.[0],
+				password: fieldErrors.password?.[0],
+			})
+			return
+		}
+
+		setErrors({})
+
+		try {
+			const response = await axios.post(
+				'https://sample-e-1.onrender.com/login',
+				{
+					email: validation.data.email,
+					password: validation.data.password,
+				}
+			)
+
+			const token =
+				response.data?.token ||
+				response.data?.accessToken ||
+				response.data?.jwt ||
+				response.data?.data?.token ||
+				response.data?.data?.accessToken ||
+				''
+
+			if (token) {
+				window.localStorage.setItem(AUTH_TOKEN_KEY, token)
+			}
+
+			const sessionData = {
+				email: validation.data.email,
+				loggedInAt: new Date().toISOString(),
+				token,
+				response: response.data,
+			}
+
+			window.localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(sessionData))
+
+			if (formData.rememberMe) {
+				window.localStorage.setItem(REMEMBERED_EMAIL_KEY, validation.data.email)
+			} else {
+				window.localStorage.removeItem(REMEMBERED_EMAIL_KEY)
+			}
+
+			console.log(response.data)
+			window.location.href = '/home'
+		} catch (error) {
+			console.error(error)
+			alert('Login failed')
+		}
+	}
 
 	return (
 		<main className="auth-page auth-page--login">
@@ -88,8 +160,10 @@ function Login() {
 							value={formData.email}
 							onChange={handleChange}
 							autoComplete="email"
-							required
+							aria-invalid={Boolean(errors.email)}
+							aria-describedby={errors.email ? 'email-error' : undefined}
 						/>
+						{errors.email ? <p className="field-error" id="email-error">{errors.email}</p> : null}
 
 						<div className="password-row">
 							<label htmlFor="password">Password</label>
@@ -110,8 +184,10 @@ function Login() {
 							value={formData.password}
 							onChange={handleChange}
 							autoComplete="current-password"
-							required
+							aria-invalid={Boolean(errors.password)}
+							aria-describedby={errors.password ? 'password-error' : undefined}
 						/>
+						{errors.password ? <p className="field-error" id="password-error">{errors.password}</p> : null}
 
 						<div className="login-options">
 							<label className="checkbox-row" htmlFor="rememberMe">
