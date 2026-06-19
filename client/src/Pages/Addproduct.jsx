@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react'
 import { z } from 'zod'
 import './Addproduct.css'
 
+const LOCAL_PRODUCTS_STORAGE_KEY = 'northstar-products'
+
 const productSchema = z.object({
 	name: z.string().trim().min(1, 'Product name is required'),
 	category: z.string().trim().min(1, 'Category is required'),
@@ -89,14 +91,14 @@ function Addproduct() {
 			createdAt: new Date().toISOString(),
 		}
 
-		const storedProducts = JSON.parse(window.localStorage.getItem('northstar-products') || '[]')
+		const storedProducts = JSON.parse(window.localStorage.getItem(LOCAL_PRODUCTS_STORAGE_KEY) || '[]')
 		window.localStorage.setItem(
-			'northstar-products',
+			LOCAL_PRODUCTS_STORAGE_KEY,
 			JSON.stringify([product, ...storedProducts])
 		)
 
 		setErrors({})
-		setSuccessMessage('Product saved locally')
+		setSuccessMessage('Product added successfully')
 		setFormData(initialFormState)
 	}
 
@@ -108,7 +110,7 @@ function Addproduct() {
 					<h1>Add a new product</h1>
 					<p>
 						Create a new product entry with the details you want to show in the catalog.
-						The form stores the item locally so you can wire the API later without losing the UX.
+							The form stores the item locally so the home page can show it right away.
 					</p>
 
 					<div className="add-product-notes">

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { z } from 'zod'
+import { motion } from 'motion/react'
 import './Login.css'
 import axios from "axios";
 
@@ -11,6 +12,24 @@ const loginSchema = z.object({
 const SESSION_STORAGE_KEY = 'northstar-session'
 const AUTH_TOKEN_KEY = 'northstar-token'
 const REMEMBERED_EMAIL_KEY = 'northstar-remembered-email'
+
+const shellVariants = {
+	hidden: { opacity: 0, y: 18 },
+	visible: {
+		opacity: 1,
+		y: 0,
+		transition: {
+			duration: 0.45,
+			ease: 'easeOut',
+			staggerChildren: 0.08,
+		},
+	},
+}
+
+const panelVariants = {
+	hidden: { opacity: 0, y: 22 },
+	visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: 'easeOut' } },
+}
 
 
 function Login() {
@@ -117,9 +136,14 @@ function Login() {
 	}
 
 	return (
-		<main className="auth-page auth-page--login">
-			<section className="auth-shell" aria-label="Login form">
-				<div className="auth-visual">
+			<motion.main
+				className="auth-page auth-page--login"
+				initial="hidden"
+				animate="visible"
+				variants={shellVariants}
+			>
+				<motion.section className="auth-shell" aria-label="Login form" variants={shellVariants}>
+					<motion.div className="auth-visual" variants={panelVariants}>
 					<p className="auth-kicker">Welcome back</p>
 					<h1>Sign in to continue</h1>
 					<p>
@@ -136,9 +160,9 @@ function Login() {
 							<p>Secure sign in with a clean, focused layout.</p>
 						</div>
 					</div>
-				</div>
+					</motion.div>
 
-				<div className="auth-form-panel">
+					<motion.div className="auth-form-panel" variants={panelVariants}>
 					<a className="auth-brand" href="/">
 						<span aria-hidden="true" />
 						<strong>Northstar</strong>
@@ -225,9 +249,9 @@ function Login() {
 					<p className="signup-link-inline">
 						Don&apos;t have an account? <a href="/signup">Sign up</a>
 					</p>
-				</div>
-			</section>
-		</main>
+					</motion.div>
+				</motion.section>
+			</motion.main>
 	)
 }
 

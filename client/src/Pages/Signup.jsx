@@ -1,5 +1,24 @@
 import { useEffect, useState } from 'react'
+import { motion } from 'motion/react'
 import './Signup.css'
+
+const shellVariants = {
+	hidden: { opacity: 0, y: 18 },
+	visible: {
+		opacity: 1,
+		y: 0,
+		transition: {
+			duration: 0.45,
+			ease: 'easeOut',
+			staggerChildren: 0.08,
+		},
+	},
+}
+
+const panelVariants = {
+	hidden: { opacity: 0, y: 22 },
+	visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: 'easeOut' } },
+}
 
 function Signup() {
 	const [formData, setFormData] = useState({
@@ -36,17 +55,22 @@ function Signup() {
 	}, [successMessage])
 
 	return (
-		<main className="auth-page auth-page--signup">
-			<section className="auth-shell">
-				<div className="auth-visual">
+			<motion.main
+				className="auth-page auth-page--signup"
+				initial="hidden"
+				animate="visible"
+				variants={shellVariants}
+			>
+				<motion.section className="auth-shell" variants={shellVariants}>
+					<motion.div className="auth-visual" variants={panelVariants}>
 					<p className="auth-kicker">Create account</p>
 					<h1>Get started with Northstar</h1>
 					<p>
 						Set up your account in a few seconds and move into a cleaner way of working.
 					</p>
-				</div>
+					</motion.div>
 
-				<div className="auth-form-panel">
+					<motion.div className="auth-form-panel" variants={panelVariants}>
 					<a className="auth-brand" href="/login">
 						<span aria-hidden="true" />
 						<strong>Northstar</strong>
@@ -102,9 +126,9 @@ function Signup() {
 					<p className="signup-link">
 						Already have an account? <a href="/login">Sign in</a>
 					</p>
-				</div>
-			</section>
-		</main>
+					</motion.div>
+				</motion.section>
+			</motion.main>
 	)
 }
 

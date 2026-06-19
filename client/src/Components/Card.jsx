@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 
 const PRODUCTS_API_URL = 'https://sample-e-1.onrender.com/product/getproducts'
+const LOCAL_PRODUCTS_STORAGE_KEY = 'northstar-products'
 const IMAGE_BASE_URL = 'https://sample-e-1.onrender.com'
 
 export const earbudProducts = [
@@ -93,6 +94,39 @@ const mapApiProducts = (items) =>
 		href: '#featured',
 	}))
 
+const mapLocalProducts = (items) =>
+	items.map((item) => ({
+		badge: item.featured ? 'Featured' : item.category || 'New',
+		title: item.name || item.title || 'Unnamed product',
+		image: getImageUrl(item.image),
+		imageAlt: item.name ? `${item.name} product image` : 'Product image',
+		description: item.description || 'No description available.',
+		price: formatPrice(item.price),
+		rating: item.stock !== undefined ? `Stock ${item.stock}` : '',
+		features: [
+			item.category ? `Category: ${item.category}` : '',
+			item.featured ? 'Saved from add product page' : '',
+			item.stock !== undefined ? `Stock: ${item.stock}` : '',
+		].filter(Boolean),
+		actionLabel: 'Buy now',
+		href: '#featured',
+	}))
+
+const dedupeProducts = (items) => {
+	const seen = new Set()
+
+	return items.filter((item) => {
+		const key = [item.title, item.description, item.price, item.badge].join('|')
+
+		if (seen.has(key)) {
+			return false
+		}
+
+		seen.add(key)
+		return true
+	})
+}
+
 function Card({
 	badge,
 	title,
@@ -156,13 +190,24 @@ export function ProductCatalog({ searchTerm = '' }) {
 						: Array.isArray(payload?.data)
 							? payload.data
 							: []
+					const localProducts = JSON.parse(window.localStorage.getItem(LOCAL_PRODUCTS_STORAGE_KEY) || '[]')
+					const mergedProducts = dedupeProducts([
+						...mapLocalProducts(localProducts),
+						...mapApiProducts(items),
+					])
 
 				if (isMounted) {
-					setProducts(mapApiProducts(items))
+					setProducts(mergedProducts)
 				}
-			} catch (fetchError) {
+			} catch {
+				const localProducts = JSON.parse(window.localStorage.getItem(LOCAL_PRODUCTS_STORAGE_KEY) || '[]')
+
 				if (isMounted) {
-					setError('Unable to load products right now.')
+					if (localProducts.length > 0) {
+						setProducts(dedupeProducts(mapLocalProducts(localProducts)))
+					} else {
+						setError('Unable to load products right now.')
+					}
 				}
 			} finally {
 				if (isMounted) {
