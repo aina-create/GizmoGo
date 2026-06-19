@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react'
+import axios from 'axios'
 import { z } from 'zod'
 import './Addproduct.css'
 
-const LOCAL_PRODUCTS_STORAGE_KEY = 'northstar-products'
+const ADD_PRODUCT_API_URL = 'https://sample-e-1.onrender.com/product/addproduct'
 
 const productSchema = z.object({
 	name: z.string().trim().min(1, 'Product name is required'),
@@ -28,6 +29,8 @@ function Addproduct() {
 	const [formData, setFormData] = useState(initialFormState)
 	const [errors, setErrors] = useState({})
 	const [successMessage, setSuccessMessage] = useState('')
+	const [submitError, setSubmitError] = useState('')
+	const [isSubmitting, setIsSubmitting] = useState(false)
 
 	const previewCard = useMemo(
 		() => ({
@@ -63,10 +66,15 @@ function Addproduct() {
 		if (successMessage) {
 			setSuccessMessage('')
 		}
+
+		if (submitError) {
+			setSubmitError('')
+		}
 	}
 
-	const handleSubmit = (event) => {
+	const handleSubmit = async (event) => {
 		event.preventDefault()
+		setSubmitError('')
 
 		const validation = productSchema.safeParse(formData)
 
@@ -85,21 +93,27 @@ function Addproduct() {
 		}
 
 		const product = {
-			...validation.data,
+			name: validation.data.name,
+			category: validation.data.category,
 			price: Number(validation.data.price),
 			stock: Number(validation.data.stock),
-			createdAt: new Date().toISOString(),
+			description: validation.data.description,
+			image: validation.data.image,
 		}
 
-		const storedProducts = JSON.parse(window.localStorage.getItem(LOCAL_PRODUCTS_STORAGE_KEY) || '[]')
-		window.localStorage.setItem(
-			LOCAL_PRODUCTS_STORAGE_KEY,
-			JSON.stringify([product, ...storedProducts])
-		)
+		try {
+			setIsSubmitting(true)
+			await axios.post(ADD_PRODUCT_API_URL, product)
 
-		setErrors({})
-		setSuccessMessage('Product added successfully')
-		setFormData(initialFormState)
+			setErrors({})
+			setSuccessMessage('Product added successfully')
+			setFormData(initialFormState)
+		} catch (error) {
+			const message = error.response?.data?.message || 'Unable to add product. Please try again.'
+			setSubmitError(message)
+		} finally {
+			setIsSubmitting(false)
+		}
 	}
 
 	return (
@@ -132,6 +146,7 @@ function Addproduct() {
 					</div>
 
 					{successMessage ? <p className="add-product-success">{successMessage}</p> : null}
+					{submitError ? <p className="add-product-error">{submitError}</p> : null}
 
 					<form className="add-product-form" onSubmit={handleSubmit}>
 						<label htmlFor="name">Product name</label>
@@ -233,8 +248,8 @@ function Addproduct() {
 							<span>Show this product as featured</span>
 						</label>
 
-						<button type="submit" className="primary-button add-product-button">
-							Save product
+						<button type="submit" className="primary-button add-product-button" disabled={isSubmitting}>
+							{isSubmitting ? 'Saving...' : 'Save product'}
 						</button>
 					</form>
 				</div>
