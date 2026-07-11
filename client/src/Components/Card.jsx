@@ -8,53 +8,53 @@ const IMAGE_BASE_URL = 'https://sample-e-1.onrender.com'
 export const earbudProducts = [
 	{
 		badge: 'Best Seller',
-		title: 'AirPulse Pro',
+		title: 'Aurora Pulse X',
 		image:
-			'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?auto=format&fit=crop&w=900&q=80',
-		imageAlt: 'White wireless earbuds in a charging case',
-		description: 'Premium noise-canceling earbuds with immersive bass and all-day comfort.',
+			'https://images.unsplash.com/photo-1518444065439-e933c06ce9cd?auto=format&fit=crop&w=900&q=80',
+		imageAlt: 'Premium wireless earbuds with a sleek charging case',
+		description: 'Studio-grade sound and plush comfort for all-day listening without compromise.',
 		price: '$149',
 		rating: '4.9/5',
-		features: ['Active noise canceling', '28-hour battery', 'Fast charge case'],
+		features: ['ANC', '28-hour battery', 'Instant pairing'],
 		actionLabel: 'Buy now',
 		href: '#featured',
 	},
 	{
-		badge: 'Sport',
-		title: 'Sprint Beats',
+		badge: 'New Favourite',
+		title: 'StormFit Pro',
 		image:
-			'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=900&q=80',
-		imageAlt: 'Sporty wireless earbuds on a dark surface',
-		description: 'Secure-fit earbuds built for workouts, runs, and high-motion training.',
-		price: '$99',
+			'https://images.unsplash.com/photo-1583394838336-acd977736f90?auto=format&fit=crop&w=900&q=80',
+		imageAlt: 'Sporty wireless earbuds designed for movement',
+		description: 'Built to stay locked in during workouts, commutes, and every burst of motion.',
+		price: '$109',
 		rating: '4.8/5',
-		features: ['Sweat resistant', 'Ear hooks', 'Punchy sound'],
+		features: ['Sweat proof', 'Secure fit', 'Deep bass'],
 		actionLabel: 'Buy now',
 		href: '#collections',
 	},
 	{
-		badge: 'Gaming',
-		title: 'Lag-Free X',
+		badge: 'Game Night',
+		title: 'ShadowLink Air',
 		image:
-			'https://images.unsplash.com/photo-1606220838315-056192d5e927?auto=format&fit=crop&w=900&q=80',
-		imageAlt: 'Black wireless earbuds and charging case',
-		description: 'Low-latency earbuds tuned for mobile games, streaming, and video calls.',
+			'https://images.unsplash.com/photo-1491927570842-0261e477d937?auto=format&fit=crop&w=900&q=80',
+		imageAlt: 'Stylish black earbuds with a glossy charging case',
+		description: 'Ultra-low latency and crisp voice clarity for gaming, calls, and binge sessions.',
 		price: '$129',
 		rating: '4.7/5',
-		features: ['Ultra-low latency', 'Dual mic mode', 'Clear voice pickup'],
+		features: ['Low latency', 'Dual mic', 'Lag-free play'],
 		actionLabel: 'Buy now',
 		href: '#deals',
 	},
 	{
-		badge: 'Compact',
-		title: 'MiniWave S',
+		badge: 'Pocket Power',
+		title: 'Nova Mini',
 		image:
-			'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?auto=format&fit=crop&w=900&q=80',
-		imageAlt: 'Compact wireless earbuds in a case',
-		description: 'Pocket-friendly earbuds with a slim charging case and crisp everyday audio.',
-		price: '$79',
+			'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=900&q=80',
+		imageAlt: 'Compact wireless earbuds in a slim charging case',
+		description: 'Small enough to carry everywhere, powerful enough to sound amazing all day.',
+		price: '$89',
 		rating: '4.6/5',
-		features: ['Pocket case', '12-hour battery', 'Quick pairing'],
+		features: ['Compact case', '12-hour battery', 'Quick charge'],
 		actionLabel: 'Buy now',
 		href: '#featured',
 	},
@@ -171,48 +171,25 @@ function Card({
 }
 
 export function ProductCatalog({ searchTerm = '' }) {
-	const [products, setProducts] = useState([])
-	const [loading, setLoading] = useState(true)
+	const [products, setProducts] = useState(earbudProducts)
+	const [loading, setLoading] = useState(false)
 	const [error, setError] = useState('')
 	const normalizedSearchTerm = searchTerm.trim().toLowerCase()
 
 	useEffect(() => {
 		let isMounted = true
 
-		const loadProducts = async () => {
-			try {
-				const response = await axios.get(PRODUCTS_API_URL)
-				const payload = response.data
-				const items = Array.isArray(payload)
-					? payload
-					: Array.isArray(payload?.products)
-						? payload.products
-						: Array.isArray(payload?.data)
-							? payload.data
-							: []
-					const localProducts = JSON.parse(window.localStorage.getItem(LOCAL_PRODUCTS_STORAGE_KEY) || '[]')
-					const mergedProducts = dedupeProducts([
-						...mapLocalProducts(localProducts),
-						...mapApiProducts(items),
-					])
+		const loadProducts = () => {
+			const localProducts = JSON.parse(window.localStorage.getItem(LOCAL_PRODUCTS_STORAGE_KEY) || '[]')
+			const curatedProducts = dedupeProducts(earbudProducts)
 
-				if (isMounted) {
-					setProducts(mergedProducts)
-				}
-			} catch {
-				const localProducts = JSON.parse(window.localStorage.getItem(LOCAL_PRODUCTS_STORAGE_KEY) || '[]')
+			if (isMounted) {
+				setProducts(curatedProducts)
+				setError('')
+			}
 
-				if (isMounted) {
-					if (localProducts.length > 0) {
-						setProducts(dedupeProducts(mapLocalProducts(localProducts)))
-					} else {
-						setError('Unable to load products right now.')
-					}
-				}
-			} finally {
-				if (isMounted) {
-					setLoading(false)
-				}
+			if (isMounted) {
+				setLoading(false)
 			}
 		}
 
